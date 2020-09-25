@@ -4,6 +4,7 @@ workflows:
   version: 2
   workflow:
     jobs:
+      - test-2.7
       - test-3.6
       - static-code-analysis
 
@@ -24,6 +25,11 @@ jobs:
     docker:
       - image: circleci/python:3.6
 
+  test-2.7:
+    <<: *defaults
+    docker:
+      - image: circleci/python:2.7
+
   static-code-analysis:
     working_directory: ~/code
     docker:
@@ -32,7 +38,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo pip install .[tests] black isort
+          command: sudo pip install .[tests] black isort mypy
       - run:
           name: black
           command: black --check .
