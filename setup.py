@@ -12,7 +12,7 @@ install_requires = ["attr", "requests", "structlog", "typing", "ciso8601"]
 if sys.version_info < (3, 3):
     install_requires += ["enum34"]
 
-tests_require = install_requires + ["pytest", "mypy", "flake8", "isort"]
+tests_require = install_requires + ["pytest", "mypy", "flake8"]
 
 setup(
     name="authalligator_client",

@@ -32,7 +32,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo pip install .[tests]
+          command: sudo pip install .[tests] black isort
       - run:
           name: black
           command: black --check .
