@@ -1,0 +1,47 @@
+version: 2
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - test-3.6
+      - static-code-analysis
+
+defaults: &defaults
+  working_directory: ~/code
+  steps:
+  - checkout
+  - run:
+      name: Install dependencies
+      command: sudo pip install .[tests]
+  - run:
+      name: Test
+      command: pytest
+
+jobs:
+  test-3.6:
+    <<: *defaults
+    docker:
+      - image: circleci/python:3.6
+
+  static-code-analysis:
+    working_directory: ~/code
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: sudo pip install .[tests]
+      - run:
+          name: black
+          command: black --check .
+      - run:
+          name: isort
+          command: isort -c .
+      - run:
+          name: mypy
+          command: mypy authalligator_client tests
+      - run:
+          name: flake8
+          command: flake8

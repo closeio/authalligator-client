@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+  postgres:
+    image: postgres:11.5
+    command: postgres -c fsync=off -c synchronous_commit=off
+    environment:
+      PGOPTIONS: "--search_path=authalligator,public"
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+      - ./scripts/postgres/:/docker-entrypoint-initdb.d:delegated
+
+  authalligator_service:
+    image: authalligator_app
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      SQLALCHEMY_DATABASE_URI: postgresql://authalligator_admin@postgres/authalligator
+    depends_on:
+      - postgres
+
+  authalligator_client:
+    image: authalligator_client
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      AUTHALLIGATOR_SERVICE: authalligator_service
+    volumes:
+      - .:/src:delegated
+
+
+volumes:
+  postgresdata:
