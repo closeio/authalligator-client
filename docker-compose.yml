@@ -20,7 +20,6 @@ services:
       - postgres
 
   authalligator_client:
-    image: authalligator_client
     build:
       context: .
       dockerfile: Dockerfile
@@ -31,6 +30,16 @@ services:
     volumes:
       - .:/src:delegated
 
+  authalligator_client_py2:
+    build:
+      context: .
+      dockerfile: Dockerfile.py2
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      AUTHALLIGATOR_SERVICE: authalligator_service
+    volumes:
+      - .:/src:delegated
 
 volumes:
   postgresdata:

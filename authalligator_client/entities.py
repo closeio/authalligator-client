@@ -34,7 +34,10 @@ MaybeOmitted = Union[Omitted, T]
 U = TypeVar("U", bound="BaseAAEntity")
 
 
-def entity_converter(entity_cls: Union[List[Type[U]], Type[U]]) -> Callable[[Dict], U]:
+def entity_converter(
+    entity_cls,  # type: Union[List[Type[U]], Type[U]]
+):
+    # type: (...) -> Callable[[Dict], U]
     """
     Convert a dictionary response into instances of the entity class.
 
@@ -59,13 +62,14 @@ def entity_converter(entity_cls: Union[List[Type[U]], Type[U]]) -> Callable[[Dic
         provided entity. If none of the provided types match of if the fields
         don't align with the provided entity, a ``TypeError`` is raised.
     """
-    entity_classes: List[Type[U]]
+    entity_classes = []  # type: List[Type[U]]
     if isinstance(entity_cls, (list, tuple)):
         entity_classes = entity_cls
     else:
         entity_classes = [entity_cls]
 
-    def _entity_converter(val: Union[Dict[str, Any], U]) -> U:
+    def _entity_converter(val):
+        # type: (Union[Dict[str, Any], U]) -> U
         # check if it's already an entity
         if any([isinstance(val, e_cls) for e_cls in entity_classes]):
             return cast(U, val)
@@ -76,10 +80,9 @@ def entity_converter(entity_cls: Union[List[Type[U]], Type[U]]) -> Callable[[Dic
 
         # if there's more than one possibility for entity classes, pick the
         # right one based on ``__typename``
-        selected_cls: Type[U]
         if len(entity_classes) == 1:
             # only one option, we don't need an explicit type
-            selected_cls = entity_classes[0]
+            selected_cls = entity_classes[0]  # type: Type[U]
         else:
             # a few different return types are expected
             typename = val.pop("__typename", None)
@@ -87,14 +90,14 @@ def entity_converter(entity_cls: Union[List[Type[U]], Type[U]]) -> Callable[[Dic
                 type_options = ", ".join([e.TYPENAME for e in entity_classes])
                 raise TypeError(
                     'No "__typename" present to disambiguate between possible '
-                    f"types: [{type_options}]"
+                    "types: [{}]".format(type_options)
                 )
 
-            matching_typename: Optional[Type[U]] = next(
+            matching_typename = next(
                 (e for e in entity_classes if e.TYPENAME == typename), None
-            )
+            )  # type: Optional[Type[U]]
             if matching_typename is None:
-                raise TypeError(f'No entity found for type "{typename}"')
+                raise TypeError('No entity found for type "{}"'.format(typename))
 
             selected_cls = matching_typename
 
@@ -104,8 +107,8 @@ def entity_converter(entity_cls: Union[List[Type[U]], Type[U]]) -> Callable[[Dic
 
 
 @attr.attrs(frozen=True)
-class BaseAAEntity:
-    TYPENAME: str
+class BaseAAEntity(object):
+    TYPENAME = ""  # type: str
     """The name of the graphql type in the schema.
 
     Used for disambiguation when there's more than one possible type being
@@ -115,15 +118,18 @@ class BaseAAEntity:
     as_dict = as_json_dict
 
     @classmethod
-    def from_api_response(cls: Type[U], data: Dict[str, Any]) -> U:
+    def from_api_response(cls, data):
+        # type: (Type[U], Dict[str, Any]) -> U
         # If __typename is present, this asserts that it matches this class's
         # expected typename
         typename = data.pop("__typename", None)
         if typename and typename != cls.TYPENAME:
             raise TypeError(
-                f"Given type \"{typename}\" doesn't match this entity's type: "
-                f'"{cls.TYPENAME}". Is {cls.__name__} the right entity for '
-                "this data?"
+                (
+                    "Given type \"{}\" doesn't match this entity's type: "
+                    '"{}". Is {} the right entity for '
+                    "this data?"
+                ).format(typename, cls.TYPENAME, cls.__name__)
             )
 
         # convert top-level kwargs from camelCase to snake_case
@@ -138,56 +144,54 @@ class BaseAAEntity:
 class AccountError(BaseAAEntity):
     TYPENAME = "AccountError"
 
-    code: enums.AccountErrorCode = attr.attrib(
+    code = attr.attrib(
         converter=enum_converter(enums.AccountErrorCode),  # type: ignore[misc]
-    )
-    message: Optional[int] = attr.attrib()
-    retry_in: Optional[int] = attr.attrib()
+    )  # type: enums.AccountErrorCode
+    message = attr.attrib()  # type: Optional[int]
+    retry_in = attr.attrib()  # type: Optional[int]
 
 
 @attr.attrs(frozen=True)
 class Account(BaseAAEntity):
     TYPENAME = "Account"
 
-    provider: enums.ProviderType = attr.attrib(
+    provider = attr.attrib(
         converter=enum_converter(enums.ProviderType),  # type: ignore[misc]
-    )
-    username: str = attr.attrib()
-    access_token: Optional[str] = attr.attrib()
-    access_token_expires_at: Optional[datetime.datetime] = attr.attrib(
+    )  # type: enums.ProviderType
+    username = attr.attrib()  # type: str
+    access_token = attr.attrib()  # type: Optional[str]
+    access_token_expires_at = attr.attrib(
         converter=converters.optional(ciso8601.parse_datetime),
-    )
+    )  # type: Optional[datetime.datetime]
 
 
 @attr.attrs(frozen=True)
 class AuthorizeAccountPayload(BaseAAEntity):
     TYPENAME = "AuthorizeAccountPayload"
 
-    account: Account = attr.attrib(
+    account = attr.attrib(
         converter=entity_converter(Account),  # type: ignore[misc]
-    )
-    account_key: str = attr.attrib()
-    number_of_account_keys: int = attr.attrib()
+    )  # type: Account
+    account_key = attr.attrib()  # type: str
+    number_of_account_keys = attr.attrib()  # type: int
 
 
 @attr.attrs(frozen=True)
 class Query(BaseAAEntity):
-    account: MaybeOmitted[Union[Account, AccountError]] = attr.attrib(
+    account = attr.attrib(
         default=OMITTED,
         converter=entity_converter([Account, AccountError]),  # type: ignore[misc]
-    )
+    )  # type: MaybeOmitted[Union[Account, AccountError]]
 
 
 @attr.attrs(frozen=True)
 class Mutation(BaseAAEntity):
     # mypy and the attrs plugin doens't like the `MaybeOmitted` stuff
-    authorize_account: MaybeOmitted[
-        Union[AuthorizeAccountPayload, AccountError]
-    ] = attr.attrib(  # type: ignore
+    authorize_account = attr.attrib(  # type: ignore
         default=OMITTED,
         # ignore unsupport converter warning
         converter=cast(  # type: ignore[misc]
             Union[AuthorizeAccountPayload, AccountError],
             entity_converter([AuthorizeAccountPayload, AccountError]),
         ),
-    )
+    )  # type: MaybeOmitted[Union[AuthorizeAccountPayload, AccountError]]

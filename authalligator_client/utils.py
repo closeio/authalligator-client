@@ -1,12 +1,13 @@
 import datetime
 import enum
 import re
-from typing import Callable, Type, Union
+from typing import Any, Callable, Dict, Type, Union
 
 import attr
 
 
-def to_camel_case(snake_str: str) -> str:
+def to_camel_case(snake_str):
+    # type: (str) -> str
     """Convert snake_case to camelCase.
 
     Adapted from this response in Stackoverflow:
@@ -23,7 +24,8 @@ _to_snake_case_regex_1 = re.compile("(.)([A-Z][a-z]+)")
 _to_snake_case_regex_2 = re.compile("([a-z0-9])([A-Z])")
 
 
-def to_snake_case(name: str) -> str:
+def to_snake_case(name):
+    # type: (str) -> str
     """Convert camelCase to snake_case.
 
     From this response in Stackoverflow:
@@ -33,11 +35,10 @@ def to_snake_case(name: str) -> str:
     return _to_snake_case_regex_2.sub(r"\1_\2", s1).lower()
 
 
-def enum_converter(
-    enum_type: Type[enum.Enum],
-) -> Callable[[Union[str, enum.Enum]], enum.Enum]:
+def enum_converter(enum_type):
+    # type: (Type[enum.Enum]) -> Callable[[Union[str, enum.Enum]], enum.Enum]
     """
-    Convert values to an instance of ``enum_type`` or raise ``ValueError``
+    Convert values to an instance of ``enum_type`` or raise ``ValueError``.
 
     Example Usage::
 
@@ -52,7 +53,8 @@ def enum_converter(
         assert MyClass(val='a') == MyClass(val=MyEnum.a)
     """
 
-    def _enum_converter(val: Union[str, enum.Enum]) -> enum.Enum:
+    def _enum_converter(val):
+        # type: (Union[str, enum.Enum]) -> enum.Enum
         if isinstance(val, enum_type):
             return val
 
@@ -70,6 +72,7 @@ def enum_converter(
 
 
 def as_json_dict(obj):
+    # type: (Any) -> Dict
     """
     Similar to attr.asdict, but will prioritize an `as_dict` instance method
     over ``attr.asdict`` (if present) on nested objects and tries to convert

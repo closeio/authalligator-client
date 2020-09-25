@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from typing import Any, Dict, Type, TypeVar, Union
 
 import attr
@@ -14,17 +16,18 @@ T = TypeVar("T", bound=entities.BaseAAEntity)
 
 @attr.attrs
 class Client(object):
-    token: str = attr.attrib()
-    service_url: str = attr.attrib()
+    token = attr.attrib()  # type: str
+    service_url = attr.attrib()  # type: str
 
-    timeout: int = attr.attrib(default=10)
+    timeout = attr.attrib(default=10)  # type: int
 
     def _make_request(
         self,
-        query: str,
-        variables: Dict[str, Any],
-        return_types: Type[T],
-    ) -> T:
+        query,  # type: str
+        variables,  # type: Dict[str, Any]
+        return_types,  # type: Type[T]
+    ):
+        # type: (...) -> T
         response = requests.post(
             f"{self.service_url}/graphql",
             json={"query": query, "variables": variables},
@@ -54,10 +57,11 @@ class Client(object):
 
     def authorize_account(
         self,
-        provider: enums.ProviderType,
-        authorization_code: str,
-        redirect_uri: str,
-    ) -> Union[entities.AuthorizeAccountPayload, entities.AccountError]:
+        provider,  # type: enums.ProviderType
+        authorization_code,  # type: str
+        redirect_uri,  # type: str
+    ):
+        # type: (...) -> Union[entities.AuthorizeAccountPayload, entities.AccountError]
         """Obtain OAuth access token and refresh token.
 
         This does some basic error handling on the reponse.
@@ -110,8 +114,12 @@ class Client(object):
         return result.authorize_account
 
     def query_account(
-        self, provider: enums.ProviderType, username: str, account_key: str
-    ) -> Union[entities.Account, entities.AccountError]:
+        self,
+        provider,  # type: enums.ProviderType
+        username,  # type: str
+        account_key,  # type: str
+    ):
+        # type: (...) -> Union[entities.Account, entities.AccountError]
         """Obtain a valid access token.
 
         Args:
