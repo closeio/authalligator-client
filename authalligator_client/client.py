@@ -20,7 +20,10 @@ class AuthAlligatorApiClient(object):
     timeout: int = attr.attrib(default=10)
 
     def _make_request(
-        self, query: str, variables: Dict[str, Any], return_types: Type[T],
+        self,
+        query: str,
+        variables: Dict[str, Any],
+        return_types: Type[T],
     ) -> T:
         response = requests.post(
             f"{self.service_url}/graphql",
@@ -50,7 +53,10 @@ class AuthAlligatorApiClient(object):
         return entities.entity_converter(return_types)(data)
 
     def authorize_account(
-        self, provider: enums.ProviderType, authorization_code: str, redirect_uri: str,
+        self,
+        provider: enums.ProviderType,
+        authorization_code: str,
+        redirect_uri: str,
     ) -> Union[entities.AuthorizeAccountPayload, entities.AccountError]:
         """Obtain OAuth access token and refresh token.
 
@@ -138,7 +144,9 @@ class AuthAlligatorApiClient(object):
             }
         """
         input_var = input_types.AccountAccessInput(
-            provider=provider, username=username, account_key=account_key,
+            provider=provider,
+            username=username,
+            account_key=account_key,
         )
         result = self._make_request(
             query=query,

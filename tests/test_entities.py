@@ -70,7 +70,11 @@ class TypeD(BaseAAEntity):
             {"__typename": "TypeA", "common": "asdf", "b": "b"},
             TypeError,
         ),
-        ([TypeA, TypeB], {"__typename": "TypeC", "common": "asdf"}, TypeError,),
+        (
+            [TypeA, TypeB],
+            {"__typename": "TypeC", "common": "asdf"},
+            TypeError,
+        ),
         # nested converters, single option
         (
             TypeC,
@@ -79,7 +83,10 @@ class TypeD(BaseAAEntity):
         ),
         (
             TypeC,
-            {"__typename": "TypeC", "b": {"__typename": "TypeA", "common": "asdf"},},
+            {
+                "__typename": "TypeC",
+                "b": {"__typename": "TypeA", "common": "asdf"},
+            },
             TypeError,
         ),
         # nested converter, multiple options
