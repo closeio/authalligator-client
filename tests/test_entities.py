@@ -26,14 +26,20 @@ class TypeB(BaseAAEntity):
 class TypeC(BaseAAEntity):
     TYPENAME = "TypeC"
 
-    b = attr.attrib(default=OMITTED, converter=entity_converter(TypeB))  # type: ignore[misc]
+    b = attr.attrib(
+        default=OMITTED,
+        converter=entity_converter(TypeB),  # type: ignore[misc]
+    )
 
 
 @attr.attrs(frozen=True)
 class TypeD(BaseAAEntity):
     TYPENAME = "TypeD"
 
-    inner = attr.attrib(default=OMITTED, converter=entity_converter([TypeA, TypeB]))  # type: ignore[misc]
+    inner = attr.attrib(
+        default=OMITTED,
+        converter=entity_converter([TypeA, TypeB]),  # type: ignore[misc]
+    )
 
 
 @pytest.mark.parametrize(
