@@ -13,7 +13,7 @@ T = TypeVar("T", bound=entities.BaseAAEntity)
 
 
 @attr.attrs
-class AuthAlligatorApiClient(object):
+class Client(object):
     token: str = attr.attrib()
     service_url: str = attr.attrib()
 
