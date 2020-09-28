@@ -147,7 +147,7 @@ class AccountError(BaseAAEntity):
     code = attr.attrib(
         converter=enum_converter(enums.AccountErrorCode),  # type: ignore[misc]
     )  # type: enums.AccountErrorCode
-    message = attr.attrib()  # type: Optional[int]
+    message = attr.attrib()  # type: Optional[str]
     retry_in = attr.attrib()  # type: Optional[int]
 
 

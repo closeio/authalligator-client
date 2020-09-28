@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from typing import Any, Dict, Type, TypeVar, Union
+from typing import Any, Dict, Type, TypeVar
 
 import attr
 import requests
@@ -29,7 +29,7 @@ class Client(object):
     ):
         # type: (...) -> T
         response = requests.post(
-            f"{self.service_url}/graphql",
+            "{}/graphql".format(self.service_url),
             json={"query": query, "variables": variables},
             auth=(self.token, ""),
             timeout=self.timeout,
@@ -37,9 +37,10 @@ class Client(object):
 
         # responses (even for errors) should always be HTTP 200
         if response.status_code != 200:
-            exc_cls: Type[exc.AuthAlligatorException]
             if response.status_code in (401, 403):
-                exc_cls = exc.AuthAlligatorUnauthorizedError
+                exc_cls = (
+                    exc.AuthAlligatorUnauthorizedError
+                )  # type: Type[exc.UnexpectedStatusCode]
             else:
                 exc_cls = exc.UnexpectedStatusCode
 
@@ -61,7 +62,7 @@ class Client(object):
         authorization_code,  # type: str
         redirect_uri,  # type: str
     ):
-        # type: (...) -> Union[entities.AuthorizeAccountPayload, entities.AccountError]
+        # type: (...) -> entities.AuthorizeAccountPayload
         """Obtain OAuth access token and refresh token.
 
         This does some basic error handling on the reponse.
@@ -111,6 +112,13 @@ class Client(object):
             return_types=entities.Mutation,
         )
         assert result.authorize_account is not entities.OMITTED
+        if isinstance(result.authorize_account, entities.AccountError):
+            raise exc.AccountError(
+                code=result.authorize_account.code,
+                message=result.authorize_account.message,
+                retry_in=result.authorize_account.retry_in,
+            )
+
         return result.authorize_account
 
     def query_account(
@@ -119,7 +127,7 @@ class Client(object):
         username,  # type: str
         account_key,  # type: str
     ):
-        # type: (...) -> Union[entities.Account, entities.AccountError]
+        # type: (...) -> entities.Account
         """Obtain a valid access token.
 
         Args:
@@ -162,4 +170,10 @@ class Client(object):
             return_types=entities.Query,
         )
         assert result.account is not entities.OMITTED
+        if isinstance(result.account, entities.AccountError):
+            raise exc.AccountError(
+                code=result.account.code,
+                message=result.account.message,
+                retry_in=result.account.retry_in,
+            )
         return result.account
