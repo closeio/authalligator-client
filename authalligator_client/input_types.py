@@ -4,27 +4,27 @@ from . import enums
 from .utils import as_json_dict, enum_converter, to_camel_case
 
 
-@attr.attrs(auto_attribs=True)
-class AuthAlligatorInputType:
+@attr.attrs()
+class AuthAlligatorInputType(object):
     def as_dict(self):
         serialized = as_json_dict(self)
         # snake_case to camelCase
         return {to_camel_case(k): v for k, v in serialized.items()}
 
 
-@attr.attrs(auto_attribs=True)
+@attr.attrs()
 class AuthorizeAccountInput(AuthAlligatorInputType):
-    provider: enums.ProviderType = attr.attrib(
+    provider = attr.attrib(
         converter=enum_converter(enums.ProviderType)  # type: ignore[misc]
-    )
-    authorization_code: str
-    redirect_uri: str
+    )  # type: enums.ProviderType
+    authorization_code = attr.attrib()  # type: str
+    redirect_uri = attr.attrib()  # type: str
 
 
-@attr.attrs(auto_attribs=True)
+@attr.attrs()
 class AccountAccessInput(AuthAlligatorInputType):
-    provider: enums.ProviderType = attr.attrib(
+    provider = attr.attrib(
         converter=enum_converter(enums.ProviderType)  # type: ignore[misc]
-    )
-    username: str
-    account_key: str
+    )  # type: enums.ProviderType
+    username = attr.attrib()  # type: str
+    account_key = attr.attrib()  # type: str
