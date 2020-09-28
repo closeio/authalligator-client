@@ -40,7 +40,7 @@ class Client(object):
             if response.status_code in (401, 403):
                 exc_cls = (
                     exc.AuthAlligatorUnauthorizedError
-                )  # type: Type[exc.AuthAlligatorException]
+                )  # type: Type[exc.UnexpectedStatusCode]
             else:
                 exc_cls = exc.UnexpectedStatusCode
 

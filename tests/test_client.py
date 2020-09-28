@@ -1,12 +1,13 @@
-import datetime
 import contextlib
-import pytest
-import mock
+import datetime
 
-from authalligator_client.client import Client
-from authalligator_client.enums import ProviderType, AccountErrorCode
-from authalligator_client.entities import AuthorizeAccountPayload, Account
+import mock
+import pytest
+
 from authalligator_client import exceptions as exc
+from authalligator_client.client import Client
+from authalligator_client.entities import Account, AuthorizeAccountPayload
+from authalligator_client.enums import AccountErrorCode, ProviderType
 
 
 class MockResponse:
