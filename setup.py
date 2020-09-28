@@ -7,7 +7,13 @@ from setuptools import setup
 with open("README.md", encoding="utf-8") as file:
     long_description = file.read()
 
-install_requires = ["attrs", "requests", "structlog", "typing", "ciso8601"]
+install_requires = [
+    "attrs",
+    "requests",
+    "structlog",
+    'typing;python_version<"3.5"',
+    "ciso8601",
+]
 
 if sys.version_info < (3, 3):
     install_requires += ["enum34"]
