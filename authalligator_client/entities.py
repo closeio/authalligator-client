@@ -173,6 +173,7 @@ class DeleteOtherAccountKeysPayload(BaseAAEntity):
     # placeholder to work around the language not supporting empty responses.
     # It has no meaning and will never have a meaningful value.
 
+
 @attr.attrs(frozen=True)
 class AuthorizeAccountPayload(BaseAAEntity):
     TYPENAME = "AuthorizeAccountPayload"
