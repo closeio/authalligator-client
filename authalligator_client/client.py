@@ -201,8 +201,10 @@ class Client(object):
                 have access to the specific account
 
         Returns:
-            Not much of anything, just a placeholder boolean. Raises an
-            exception for account errors.
+            DeleteOtherAccountKeysPayload on success.
+
+        Raises:
+            AccountError in case of an account error.
         """
         query = """
             mutation deleteOtherAccountKeys($input: AccountAccessInput!) {
