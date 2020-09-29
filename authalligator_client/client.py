@@ -54,7 +54,12 @@ class Client(object):
             raise exc.AuthAlligatorQueryError(errors=errors)
 
         data = result["data"]
-        return entities.entity_converter(return_types)(data)
+        converted_result = entities.entity_converter(return_types)(data)
+
+        # this should never happen
+        assert converted_result is not entities.OMITTED
+
+        return converted_result
 
     def authorize_account(
         self,
@@ -177,3 +182,60 @@ class Client(object):
                 retry_in=result.account.retry_in,
             )
         return result.account
+
+    def delete_other_account_keys(
+        self,
+        provider,  # type: enums.ProviderType
+        username,  # type: str
+        account_key,  # type: str
+    ):
+        # type: (...) -> entities.DeleteOtherAccountKeysPayload
+        """Delete other account keys which have access to this account.
+
+        Args:
+            provider: the AuthAlligator provider this account is for. (should
+                be one of the ``ProviderType`` enum values)
+            username: the AuthAlligator-provided username for the account (this
+                will likely _not_ be the human-legible email/username)
+            account_key: the AuthAlligator-specific secret key that proves we
+                have access to the specific account
+
+        Returns:
+            Not much of anything, just a placeholder boolean. Raises an
+            exception for account errors.
+        """
+        query = """
+            mutation deleteOtherAccountKeys($input: AccountAccessInput!) {
+              deleteOtherAccountKeys(input: $input) {
+                __typename
+                ... on DeleteOtherAccountKeysPayload {
+                  _
+                }
+                ... on AccountError {
+                  code
+                  message
+                  retryIn
+                }
+              }
+            }
+        """
+        input_var = input_types.AccountAccessInput(
+            provider=provider,
+            username=username,
+            account_key=account_key,
+        )
+        result = self._make_request(
+            query=query,
+            variables={"input": input_var.as_dict()},
+            return_types=entities.Mutation,
+        )
+
+        delete_keys = result.delete_other_account_keys
+        assert delete_keys is not entities.OMITTED
+        if isinstance(delete_keys, entities.AccountError):
+            raise exc.AccountError(
+                code=delete_keys.code,
+                message=delete_keys.message,
+                retry_in=delete_keys.retry_in,
+            )
+        return delete_keys

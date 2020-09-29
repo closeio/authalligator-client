@@ -26,10 +26,6 @@ class Omitted(Enum):
 OMITTED = Omitted.token
 """A singleton to differentiate between omitted vs explicit :obj:`None`."""
 
-# convenient type annotations for OMITTED
-T = TypeVar("T")
-MaybeOmitted = Union[Omitted, T]
-
 # helper type for entity_converter
 U = TypeVar("U", bound="BaseAAEntity")
 
@@ -37,7 +33,7 @@ U = TypeVar("U", bound="BaseAAEntity")
 def entity_converter(
     entity_cls,  # type: Union[List[Type[U]], Type[U]]
 ):
-    # type: (...) -> Callable[[Dict], U]
+    # type: (...) -> Callable[[Union[Omitted, U, Dict]], Union[U, Omitted]]
     """
     Convert a dictionary response into instances of the entity class.
 
@@ -69,7 +65,11 @@ def entity_converter(
         entity_classes = [entity_cls]
 
     def _entity_converter(val):
-        # type: (Union[Dict[str, Any], U]) -> U
+        # type: (Union[Dict[str, Any], U, Omitted]) -> Union[U, Omitted]
+        # check if it's explitly been omitted (don't try to convert those)
+        if val is OMITTED:
+            return val
+
         # check if it's already an entity
         if any([isinstance(val, e_cls) for e_cls in entity_classes]):
             return cast(U, val)
@@ -166,6 +166,27 @@ class Account(BaseAAEntity):
 
 
 @attr.attrs(frozen=True)
+class DeleteOtherAccountKeysPayload(BaseAAEntity):
+    TYPENAME = "DeleteOtherAccountKeysPayload"
+
+    # the real name of this should be "_", but attrs doesn't like that
+    val = attr.attrib()  # type: Optional[bool]
+
+    @classmethod
+    def from_api_response(cls, data):
+        # attrs doesn't like the real name of '_'
+        new_data = data.copy()
+        new_data["val"] = new_data.pop("_")
+        return super(DeleteOtherAccountKeysPayload, cls).from_api_response(new_data)
+
+    def as_dict(self):
+        data = super(DeleteOtherAccountKeysPayload, self).as_dict()
+        # attrs doesn't like the real name of '_'
+        data["_"] = data.pop("val")
+        return data
+
+
+@attr.attrs(frozen=True)
 class AuthorizeAccountPayload(BaseAAEntity):
     TYPENAME = "AuthorizeAccountPayload"
 
@@ -181,17 +202,26 @@ class Query(BaseAAEntity):
     account = attr.attrib(
         default=OMITTED,
         converter=entity_converter([Account, AccountError]),  # type: ignore[misc]
-    )  # type: MaybeOmitted[Union[Account, AccountError]]
+    )  # type: Union[Omitted, Account, AccountError]
 
 
 @attr.attrs(frozen=True)
 class Mutation(BaseAAEntity):
-    # mypy and the attrs plugin doens't like the `MaybeOmitted` stuff
+    # mypy and the attrs plugin doens't like the `Omitted` default + converter
+    # stuff
     authorize_account = attr.attrib(  # type: ignore
         default=OMITTED,
         # ignore unsupport converter warning
         converter=cast(  # type: ignore[misc]
-            Union[AuthorizeAccountPayload, AccountError],
+            Union[Omitted, AuthorizeAccountPayload, AccountError],
             entity_converter([AuthorizeAccountPayload, AccountError]),
         ),
-    )  # type: MaybeOmitted[Union[AuthorizeAccountPayload, AccountError]]
+    )  # type: Union[Omitted, AuthorizeAccountPayload, AccountError]
+    delete_other_account_keys = attr.attrib(  # type: ignore
+        default=OMITTED,
+        # ignore unsupport converter warning
+        converter=cast(  # type: ignore[misc]
+            Union[Omitted, DeleteOtherAccountKeysPayload, AccountError],
+            entity_converter([DeleteOtherAccountKeysPayload, AccountError]),
+        ),
+    )  # type: Union[Omitted, DeleteOtherAccountKeysPayload, AccountError]
