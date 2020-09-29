@@ -157,7 +157,6 @@ class TestDeleteOtherAccountKeys:
             "data": {
                 "deleteOtherAccountKeys": {
                     "__typename": "DeleteOtherAccountKeysPayload",
-                    "_": True,
                 }
             }
         }
@@ -169,7 +168,6 @@ class TestDeleteOtherAccountKeys:
             )
 
         assert isinstance(result, DeleteOtherAccountKeysPayload)
-        assert result.val is True
 
     def test_delete_other_account_keys_errors(self, client):
         gql_response = {

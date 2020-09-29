@@ -208,9 +208,6 @@ class Client(object):
             mutation deleteOtherAccountKeys($input: AccountAccessInput!) {
               deleteOtherAccountKeys(input: $input) {
                 __typename
-                ... on DeleteOtherAccountKeysPayload {
-                  _
-                }
                 ... on AccountError {
                   code
                   message

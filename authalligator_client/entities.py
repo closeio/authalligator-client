@@ -169,22 +169,9 @@ class Account(BaseAAEntity):
 class DeleteOtherAccountKeysPayload(BaseAAEntity):
     TYPENAME = "DeleteOtherAccountKeysPayload"
 
-    # the real name of this should be "_", but attrs doesn't like that
-    val = attr.attrib()  # type: Optional[bool]
-
-    @classmethod
-    def from_api_response(cls, data):
-        # attrs doesn't like the real name of '_'
-        new_data = data.copy()
-        new_data["val"] = new_data.pop("_")
-        return super(DeleteOtherAccountKeysPayload, cls).from_api_response(new_data)
-
-    def as_dict(self):
-        data = super(DeleteOtherAccountKeysPayload, self).as_dict()
-        # attrs doesn't like the real name of '_'
-        data["_"] = data.pop("val")
-        return data
-
+    # While there's technically a "_" field in the schema, it's only a
+    # placeholder to work around the language not supporting empty responses.
+    # It has no meaning and will never have a meaningful value.
 
 @attr.attrs(frozen=True)
 class AuthorizeAccountPayload(BaseAAEntity):
