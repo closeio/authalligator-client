@@ -8,7 +8,7 @@ import structlog
 from attr import converters
 
 from . import enums
-from .utils import as_json_dict, enum_converter, to_snake_case
+from .utils import as_json_dict, to_snake_case
 
 logger = structlog.get_logger()
 
@@ -144,9 +144,7 @@ class BaseAAEntity(object):
 class AccountError(BaseAAEntity):
     TYPENAME = "AccountError"
 
-    code = attr.attrib(
-        converter=enum_converter(enums.AccountErrorCode),  # type: ignore[misc]
-    )  # type: enums.AccountErrorCode
+    code = attr.attrib(converter=enums.AccountErrorCode)  # type: enums.AccountErrorCode
     message = attr.attrib()  # type: Optional[str]
     retry_in = attr.attrib()  # type: Optional[int]
 
@@ -155,9 +153,7 @@ class AccountError(BaseAAEntity):
 class Account(BaseAAEntity):
     TYPENAME = "Account"
 
-    provider = attr.attrib(
-        converter=enum_converter(enums.ProviderType),  # type: ignore[misc]
-    )  # type: enums.ProviderType
+    provider = attr.attrib(converter=enums.ProviderType)  # type: enums.ProviderType
     username = attr.attrib()  # type: str
     access_token = attr.attrib()  # type: Optional[str]
     access_token_expires_at = attr.attrib(
