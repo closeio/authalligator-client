@@ -192,6 +192,11 @@ class DeleteAccountKeyPayload(DeleteOperation):
 
 
 @attr.attrs(frozen=True)
+class DeleteAccountPayload(DeleteOperation):
+    TYPENAME = "DeleteAccountPayload"
+
+
+@attr.attrs(frozen=True)
 class AuthorizeAccountPayload(BaseAAEntity):
     TYPENAME = "AuthorizeAccountPayload"
 
@@ -238,6 +243,13 @@ class Mutation(BaseAAEntity):
             entity_converter([VerifyAccountPayload, AccountError]),
         ),
     )  # type: Union[Omitted, VerifyAccountPayload, AccountError]
+    delete_account = attr.attrib(  # type: ignore
+        default=OMITTED,
+        converter=cast(  # type: ignore[misc]
+            Union[Omitted, DeleteAccountPayload, AccountError],
+            entity_converter([DeleteAccountPayload, AccountError]),
+        ),
+    )  # type: Union[Omitted, DeleteAccountPayload, AccountError]
     delete_account_key = attr.attrib(  # type: ignore
         default=OMITTED,
         converter=cast(  # type: ignore[misc]
