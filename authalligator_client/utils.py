@@ -1,7 +1,7 @@
 import datetime
 import enum
 import re
-from typing import Any, Callable, Dict, Type, Union
+from typing import Any, Dict
 
 import attr
 
