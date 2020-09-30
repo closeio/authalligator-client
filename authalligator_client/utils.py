@@ -1,7 +1,7 @@
 import datetime
 import enum
 import re
-from typing import Any, Callable, Dict, Type, Union
+from typing import Any, Dict
 
 import attr
 
@@ -33,42 +33,6 @@ def to_snake_case(name):
     """
     s1 = _to_snake_case_regex_1.sub(r"\1_\2", name)
     return _to_snake_case_regex_2.sub(r"\1_\2", s1).lower()
-
-
-def enum_converter(enum_type):
-    # type: (Type[enum.Enum]) -> Callable[[Union[str, enum.Enum]], enum.Enum]
-    """
-    Convert values to an instance of ``enum_type`` or raise ``ValueError``.
-
-    Example Usage::
-
-        class MyEnum(Enum):
-            a = 'a'
-            b = 'b'
-
-        @attrs(frozen=True)
-        class MyClass(object):
-            val = attrib(converter=enum_converter(MyEnum))
-
-        assert MyClass(val='a') == MyClass(val=MyEnum.a)
-    """
-
-    def _enum_converter(val):
-        # type: (Union[str, enum.Enum]) -> enum.Enum
-        if isinstance(val, enum_type):
-            return val
-
-        values = {e.value: e for e in enum_type}
-        if val not in values:
-            raise ValueError(
-                (
-                    "Enum value {} not found on enum type {}.\n" "Valid choices: {}"
-                ).format(val, enum_type, list(enum_type))
-            )
-
-        return values[val]
-
-    return _enum_converter
 
 
 def as_json_dict(obj):
