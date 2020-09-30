@@ -10,6 +10,7 @@ from authalligator_client.entities import (
     Account,
     AuthorizeAccountPayload,
     DeleteOtherAccountKeysPayload,
+    VerifyAccountPayload,
 )
 from authalligator_client.enums import AccountErrorCode, ProviderType
 
@@ -183,6 +184,62 @@ class TestDeleteOtherAccountKeys:
         with mock_gql_response(gql_response):
             with pytest.raises(exc.AccountError) as exc_info:
                 client.delete_other_account_keys(
+                    provider=ProviderType.TEST,
+                    username="test-username",
+                    account_key="example-access-key",
+                )
+
+        account_error = exc_info.value
+        assert account_error.code == AccountErrorCode.TRY_LATER
+        assert account_error.message == "dummy-message"
+        assert account_error.retry_in == 100
+
+
+class TestVerifyAccount:
+    def test_verify_account(self, client):
+        expires_at = datetime.datetime.now()
+        gql_response = {
+            "data": {
+                "verifyAccount": {
+                    "__typename": "VerifyAccountPayload",
+                    "account": {
+                        "provider": "TEST",
+                        "username": "test-username",
+                        "accessToken": "test-access-token",
+                        "accessTokenExpiresAt": expires_at.isoformat(),
+                    },
+                }
+            }
+        }
+        with mock_gql_response(gql_response):
+            result = client.verify_account(
+                provider=ProviderType.TEST,
+                username="test-username",
+                account_key="example-access-key",
+            )
+
+        assert isinstance(result, VerifyAccountPayload)
+        account = result.account
+        assert isinstance(account, Account)
+        assert account.provider == ProviderType.TEST
+        assert account.username == "test-username"
+        assert account.access_token == "test-access-token"
+        assert account.access_token_expires_at == expires_at
+
+    def test_verify_account_errors(self, client):
+        gql_response = {
+            "data": {
+                "verifyAccount": {
+                    "__typename": "AccountError",
+                    "code": "TRY_LATER",
+                    "message": "dummy-message",
+                    "retryIn": 100,
+                }
+            }
+        }
+        with mock_gql_response(gql_response):
+            with pytest.raises(exc.AccountError) as exc_info:
+                client.verify_account(
                     provider=ProviderType.TEST,
                     username="test-username",
                     account_key="example-access-key",
