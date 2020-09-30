@@ -9,6 +9,7 @@ from authalligator_client.client import Client
 from authalligator_client.entities import (
     Account,
     AuthorizeAccountPayload,
+    DeleteAccountKeyPayload,
     DeleteOtherAccountKeysPayload,
     VerifyAccountPayload,
 )
@@ -240,6 +241,49 @@ class TestVerifyAccount:
         with mock_gql_response(gql_response):
             with pytest.raises(exc.AccountError) as exc_info:
                 client.verify_account(
+                    provider=ProviderType.TEST,
+                    username="test-username",
+                    account_key="example-access-key",
+                )
+
+        account_error = exc_info.value
+        assert account_error.code == AccountErrorCode.TRY_LATER
+        assert account_error.message == "dummy-message"
+        assert account_error.retry_in == 100
+
+
+class TestDeleteAccountKey:
+    def test_delete_account_key(self, client):
+        gql_response = {
+            "data": {
+                "deleteAccountKey": {
+                    "__typename": "DeleteAccountKeyPayload",
+                }
+            }
+        }
+        with mock_gql_response(gql_response):
+            result = client.delete_account_key(
+                provider=ProviderType.TEST,
+                username="test-username",
+                account_key="example-access-key",
+            )
+
+        assert isinstance(result, DeleteAccountKeyPayload)
+
+    def test_delete_account_key_errors(self, client):
+        gql_response = {
+            "data": {
+                "deleteAccountKey": {
+                    "__typename": "AccountError",
+                    "code": "TRY_LATER",
+                    "message": "dummy-message",
+                    "retryIn": 100,
+                }
+            }
+        }
+        with mock_gql_response(gql_response):
+            with pytest.raises(exc.AccountError) as exc_info:
+                client.delete_account_key(
                     provider=ProviderType.TEST,
                     username="test-username",
                     account_key="example-access-key",

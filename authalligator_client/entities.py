@@ -166,12 +166,29 @@ class Account(BaseAAEntity):
 
 
 @attr.attrs(frozen=True)
-class DeleteOtherAccountKeysPayload(BaseAAEntity):
+class DeleteOperation(BaseAAEntity):
+    """Base class for delete operation payloads.
+
+    These payloads don't actually have any field information in them. While
+    there's technically a "_" field in the schema, it's only a placeholder to
+    work around the language not supporting empty responses. It has no meaning
+    and will never have a meaningful value.
+
+    This class has no specific equivalent type, it's just a convenience type
+    for these entities.
+    """
+
+    pass
+
+
+@attr.attrs(frozen=True)
+class DeleteOtherAccountKeysPayload(DeleteOperation):
     TYPENAME = "DeleteOtherAccountKeysPayload"
 
-    # While there's technically a "_" field in the schema, it's only a
-    # placeholder to work around the language not supporting empty responses.
-    # It has no meaning and will never have a meaningful value.
+
+@attr.attrs(frozen=True)
+class DeleteAccountKeyPayload(DeleteOperation):
+    TYPENAME = "DeleteAccountKeyPayload"
 
 
 @attr.attrs(frozen=True)
@@ -214,6 +231,20 @@ class Mutation(BaseAAEntity):
             entity_converter([AuthorizeAccountPayload, AccountError]),
         ),
     )  # type: Union[Omitted, AuthorizeAccountPayload, AccountError]
+    verify_account = attr.attrib(  # type: ignore
+        default=OMITTED,
+        converter=cast(  # type: ignore[misc]
+            Union[Omitted, VerifyAccountPayload, AccountError],
+            entity_converter([VerifyAccountPayload, AccountError]),
+        ),
+    )  # type: Union[Omitted, VerifyAccountPayload, AccountError]
+    delete_account_key = attr.attrib(  # type: ignore
+        default=OMITTED,
+        converter=cast(  # type: ignore[misc]
+            Union[Omitted, DeleteAccountKeyPayload, AccountError],
+            entity_converter([DeleteAccountKeyPayload, AccountError]),
+        ),
+    )  # type: Union[Omitted, DeleteAccountKeyPayload, AccountError]
     delete_other_account_keys = attr.attrib(  # type: ignore
         default=OMITTED,
         # ignore unsupport converter warning
@@ -222,10 +253,3 @@ class Mutation(BaseAAEntity):
             entity_converter([DeleteOtherAccountKeysPayload, AccountError]),
         ),
     )  # type: Union[Omitted, DeleteOtherAccountKeysPayload, AccountError]
-    verify_account = attr.attrib(  # type: ignore
-        default=OMITTED,
-        converter=cast(  # type: ignore[misc]
-            Union[Omitted, VerifyAccountPayload, AccountError],
-            entity_converter([VerifyAccountPayload, AccountError]),
-        ),
-    )  # type: Union[Omitted, VerifyAccountPayload, AccountError]
