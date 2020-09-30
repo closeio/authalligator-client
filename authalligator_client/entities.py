@@ -186,6 +186,15 @@ class AuthorizeAccountPayload(BaseAAEntity):
 
 
 @attr.attrs(frozen=True)
+class VerifyAccountPayload(BaseAAEntity):
+    TYPENAME = "VerifyAccountPayload"
+
+    account = attr.attrib(
+        converter=entity_converter(Account),  # type: ignore[misc]
+    )  # type: Account
+
+
+@attr.attrs(frozen=True)
 class Query(BaseAAEntity):
     account = attr.attrib(
         default=OMITTED,
@@ -213,3 +222,10 @@ class Mutation(BaseAAEntity):
             entity_converter([DeleteOtherAccountKeysPayload, AccountError]),
         ),
     )  # type: Union[Omitted, DeleteOtherAccountKeysPayload, AccountError]
+    verify_account = attr.attrib(  # type: ignore
+        default=OMITTED,
+        converter=cast(  # type: ignore[misc]
+            Union[Omitted, VerifyAccountPayload, AccountError],
+            entity_converter([VerifyAccountPayload, AccountError]),
+        ),
+    )  # type: Union[Omitted, VerifyAccountPayload, AccountError]

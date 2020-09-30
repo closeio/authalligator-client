@@ -238,3 +238,67 @@ class Client(object):
                 retry_in=delete_keys.retry_in,
             )
         return delete_keys
+
+    def verify_account(
+        self,
+        provider,  # type: enums.ProviderType
+        username,  # type: str
+        account_key,  # type: str
+    ):
+        # type: (...) -> entities.VerifyAccountPayload
+        """Verify that the current access token works, and refresh if needed.
+
+        Args:
+            provider: the AuthAlligator provider this account is for. (should
+                be one of the ``ProviderType`` enum values)
+            username: the AuthAlligator-provided username for the account (this
+                will likely _not_ be the human-legible email/username)
+            account_key: the AuthAlligator-specific secret key that proves we
+                have access to the specific account
+
+        Returns:
+            VerifyAccountPayload on success.
+
+        Raises:
+            AccountError in case of an account error.
+        """
+        query = """
+            mutation verifyAccount($input: AccountAccessInput!) {
+              verifyAccount(input: $input) {
+                __typename
+                ... on VerifyAccountPayload {
+                    account {
+                        provider
+                        username
+                        accessToken
+                        accessTokenExpiresAt
+                    }
+                }
+                ... on AccountError {
+                  code
+                  message
+                  retryIn
+                }
+              }
+            }
+        """
+        input_var = input_types.AccountAccessInput(
+            provider=provider,
+            username=username,
+            account_key=account_key,
+        )
+        result = self._make_request(
+            query=query,
+            variables={"input": input_var.as_dict()},
+            return_types=entities.Mutation,
+        )
+
+        verify_account = result.verify_account
+        assert verify_account is not entities.OMITTED
+        if isinstance(verify_account, entities.AccountError):
+            raise exc.AccountError(
+                code=verify_account.code,
+                message=verify_account.message,
+                retry_in=verify_account.retry_in,
+            )
+        return verify_account
