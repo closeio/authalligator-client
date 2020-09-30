@@ -302,3 +302,111 @@ class Client(object):
                 retry_in=verify_account.retry_in,
             )
         return verify_account
+
+    def delete_account_key(
+        self,
+        provider,  # type: enums.ProviderType
+        username,  # type: str
+        account_key,  # type: str
+    ):
+        # type: (...) -> entities.DeleteAccountKeyPayload
+        """Delete this account key (but not others, if they exist).
+
+        Args:
+            provider: the AuthAlligator provider this account is for. (should
+                be one of the ``ProviderType`` enum values)
+            username: the AuthAlligator-provided username for the account (this
+                will likely _not_ be the human-legible email/username)
+            account_key: the AuthAlligator-specific secret key that proves we
+                have access to the specific account
+
+        Returns:
+            DeleteAccountKeyPayload on success.
+
+        Raises:
+            AccountError in case of an account error.
+        """
+        query = """
+            mutation deleteAccountKey($input: AccountAccessInput!) {
+              deleteAccountKey(input: $input) {
+                __typename
+                ... on AccountError {
+                  code
+                  message
+                  retryIn
+                }
+              }
+            }
+        """
+        input_var = input_types.AccountAccessInput(
+            provider=provider,
+            username=username,
+            account_key=account_key,
+        )
+        result = self._make_request(
+            query=query,
+            variables={"input": input_var.as_dict()},
+            return_types=entities.Mutation,
+        )
+
+        delete_key = result.delete_account_key
+        assert delete_key is not entities.OMITTED
+        if isinstance(delete_key, entities.AccountError):
+            raise exc.AccountError(
+                code=delete_key.code,
+                message=delete_key.message,
+                retry_in=delete_key.retry_in,
+            )
+        return delete_key
+
+    def delete_account(
+        self,
+        provider,  # type: enums.ProviderType
+        username,  # type: str
+    ):
+        # type: (...) -> entities.DeleteAccountPayload
+        """Delete this account (and all associated account keys).
+
+        Args:
+            provider: the AuthAlligator provider this account is for. (should
+                be one of the ``ProviderType`` enum values)
+            username: the AuthAlligator-provided username for the account (this
+                will likely _not_ be the human-legible email/username)
+
+        Returns:
+            DeleteAccountPayload on success.
+
+        Raises:
+            AccountError in case of an account error.
+        """
+        query = """
+            mutation deleteAccount($input: DeleteAccountInput!) {
+              deleteAccount(input: $input) {
+                __typename
+                ... on AccountError {
+                  code
+                  message
+                  retryIn
+                }
+              }
+            }
+        """
+        input_var = input_types.DeleteAccountInput(
+            provider=provider,
+            username=username,
+        )
+        result = self._make_request(
+            query=query,
+            variables={"input": input_var.as_dict()},
+            return_types=entities.Mutation,
+        )
+
+        delete_account = result.delete_account
+        assert delete_account is not entities.OMITTED
+        if isinstance(delete_account, entities.AccountError):
+            raise exc.AccountError(
+                code=delete_account.code,
+                message=delete_account.message,
+                retry_in=delete_account.retry_in,
+            )
+        return delete_account

@@ -28,3 +28,11 @@ class AccountAccessInput(AuthAlligatorInputType):
     )  # type: enums.ProviderType
     username = attr.attrib()  # type: str
     account_key = attr.attrib()  # type: str
+
+
+@attr.attrs()
+class DeleteAccountInput(AuthAlligatorInputType):
+    provider = attr.attrib(
+        converter=enum_converter(enums.ProviderType)  # type: ignore[misc]
+    )  # type: enums.ProviderType
+    username = attr.attrib()  # type: str
