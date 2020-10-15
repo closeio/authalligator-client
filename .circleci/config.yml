@@ -63,3 +63,16 @@ jobs:
       - run:
           name: flake8
           command: flake8
+
+  static-code-analysis-py2:
+    working_directory: ~/code
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: sudo pip install .[tests]
+      - run:
+          name: flake8
+          command: flake8
