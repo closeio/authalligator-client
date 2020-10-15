@@ -9,6 +9,7 @@ workflows:
       - test-3.7
       - test-3.8
       - static-code-analysis
+      - static-code-analysis-py2
 
 defaults: &defaults
   working_directory: ~/code
