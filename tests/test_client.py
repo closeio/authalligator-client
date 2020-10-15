@@ -44,21 +44,16 @@ def client():
 
 class TestClientRetries:
     @mock.patch("authalligator_client.utils.time.sleep")
-    def test_basic(self, client):
-        with mock.patch("authalligator_client.client.requests.post") as mock_post:
-
-            def third_time_is_the_charm(*args, **kwargs):
-                # nonlocal is py3 specific, so we just set it on the function
-                if third_time_is_the_charm.a < 2:
-                    third_time_is_the_charm.a += 1
-                    raise requests.exceptions.RequestException
-                return MockResponse(json_data={"data": {}}, status_code=200)
-
-            third_time_is_the_charm.a = 0
-
-            mock_post.side_effect = third_time_is_the_charm
-
-            client._make_request("", {}, dict)
+    @mock.patch(
+        "authalligator_client.client.requests.post",
+        side_effect=[
+            requests.exceptions.RequestException,
+            requests.exceptions.RequestException,
+            MockResponse(json_data={"data": {}}, status_code=200),
+        ],
+    )
+    def test_basic(self, _post, _sleep, client):
+        client._make_request("", {}, dict)
 
 
 class TestAuthorizeAccount:
