@@ -23,7 +23,7 @@ class AuthAlligatorQueryError(AuthAlligatorException):
     def __init__(self, errors, *args):
         # type: (List[Dict[str, Any]], *Any) -> None
         self.errors = errors
-        super().__init__(*args)
+        super(AuthAlligatorQueryError, self).__init__(*args)
 
 
 class AuthAlligatorUnauthorizedError(UnexpectedStatusCode):
