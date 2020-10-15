@@ -7,6 +7,7 @@ import requests
 import structlog
 
 from . import entities, enums, exceptions as exc, input_types
+from .utils import retry
 
 logger = structlog.get_logger()
 
@@ -21,6 +22,7 @@ class Client(object):
 
     timeout = attr.attrib(default=10)  # type: int
 
+    @retry(exc=requests.exceptions.RequestException, tries=3, wait=1)
     def _make_request(
         self,
         query,  # type: str

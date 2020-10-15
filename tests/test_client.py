@@ -3,6 +3,7 @@ import datetime
 
 import mock
 import pytest
+import requests
 
 from authalligator_client import exceptions as exc
 from authalligator_client.client import Client
@@ -39,6 +40,24 @@ def mock_gql_response(json_data, status_code=200):
 @pytest.fixture
 def client():
     return Client(token="dummy", service_url="example.com")
+
+
+class TestClientRetries:
+    @mock.patch("authalligator_client.utils.time.sleep")
+    def test_basic(self, client):
+        with mock.patch("authalligator_client.client.requests.post") as mock_post:
+            a = 0
+
+            def third_time_is_the_charm(*args, **kwargs):
+                nonlocal a
+                if a < 2:
+                    a += 1
+                    raise requests.exceptions.RequestException
+                return MockResponse(json_data={"data": {}}, status_code=200)
+
+            mock_post.side_effect = third_time_is_the_charm
+
+            client._make_request("", {}, dict)
 
 
 class TestAuthorizeAccount:
