@@ -3,6 +3,7 @@ import datetime
 
 import mock
 import pytest
+import requests
 
 from authalligator_client import exceptions as exc
 from authalligator_client.client import Client
@@ -39,6 +40,20 @@ def mock_gql_response(json_data, status_code=200):
 @pytest.fixture
 def client():
     return Client(token="dummy", service_url="example.com")
+
+
+class TestClientRetries:
+    @mock.patch("authalligator_client.utils.time.sleep")
+    @mock.patch(
+        "authalligator_client.client.requests.post",
+        side_effect=[
+            requests.exceptions.RequestException,
+            requests.exceptions.RequestException,
+            MockResponse(json_data={"data": {}}, status_code=200),
+        ],
+    )
+    def test_basic(self, _post, _sleep, client):
+        client._make_request("", {}, dict)
 
 
 class TestAuthorizeAccount:

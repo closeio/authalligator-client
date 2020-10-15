@@ -1,6 +1,7 @@
 import datetime
 import enum
 import re
+import time
 from typing import Any, Dict
 
 import attr
@@ -86,3 +87,34 @@ def as_json_dict(obj):
                 ret[k] = as_json_dict(v)
 
     return ret
+
+
+def retry(exc=Exception, tries=1, wait=0):
+    """
+    A way to retry a function call up to [tries] times if it throws
+    a [exc] exception, with [wait] seconds in between.
+
+    Can be used as a decorator factory.
+
+    Example Usage:
+        @retry(exc=ValueError, tries=10, wait=0.3)
+        def unreliable_function(foo):
+            # ...
+        unreliable_function('boy')
+    """
+
+    def decorator(func):
+        def _retry(*args, **kwargs):
+            tries_left = tries
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except exc:
+                    tries_left -= 1
+                    if tries_left <= 0:
+                        raise
+                    time.sleep(wait)
+
+        return _retry
+
+    return decorator
