@@ -46,14 +46,15 @@ class TestClientRetries:
     @mock.patch("authalligator_client.utils.time.sleep")
     def test_basic(self, client):
         with mock.patch("authalligator_client.client.requests.post") as mock_post:
-            a = 0
 
             def third_time_is_the_charm(*args, **kwargs):
-                nonlocal a
-                if a < 2:
-                    a += 1
+                # nonlocal is py3 specific, so we just set it on the function
+                if third_time_is_the_charm.a < 2:
+                    third_time_is_the_charm.a += 1
                     raise requests.exceptions.RequestException
                 return MockResponse(json_data={"data": {}}, status_code=200)
+
+            third_time_is_the_charm.a = 0
 
             mock_post.side_effect = third_time_is_the_charm
 

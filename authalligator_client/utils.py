@@ -114,6 +114,7 @@ def retry(exc=Exception, tries=1, wait=0):
                     if tries_left <= 0:
                         raise
                     time.sleep(wait)
+
         return _retry
 
     return decorator
