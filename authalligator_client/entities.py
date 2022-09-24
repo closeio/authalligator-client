@@ -170,7 +170,9 @@ class Account(BaseAAEntity):
     access_token_expires_at = attr.attrib(
         converter=converters.optional(ciso8601.parse_datetime),
     )  # type: Optional[datetime.datetime]
-    access = attr.attrib()  # type: List[AccessToken]
+    access = attr.attrib(
+        converter=entity_converter(AccessToken)
+    )  # type: Union[Omitted, List[AccessToken]]
 
 
 @attr.attrs(frozen=True)
