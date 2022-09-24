@@ -72,7 +72,7 @@ class TestAuthorizeAccount:
                             "token": "access-token-example",
                             "scopes": ["scope1", "scope2"],
                             "expiresAt": expires_at.isoformat(),
-                        }
+                        },
                     },
                     "accountKey": "dummy-account-key",
                     "numberOfAccountKeys": 1,
@@ -138,7 +138,7 @@ class TestQueryAccount:
                         "token": "access-token-example",
                         "scopes": ["scope1", "scope2"],
                         "expiresAt": expires_at.isoformat(),
-                    }
+                    },
                 }
             }
         }
@@ -241,7 +241,7 @@ class TestVerifyAccount:
                             "token": "access-token-example",
                             "scopes": ["scope1", "scope2"],
                             "expiresAt": expires_at.isoformat(),
-                        }
+                        },
                     },
                 }
             }

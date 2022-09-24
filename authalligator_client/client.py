@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from typing import Any, Dict, Type, TypeVar, Optional, List
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
 import attr
 import requests
@@ -68,7 +68,7 @@ class Client(object):
         provider,  # type: enums.ProviderType
         authorization_code,  # type: str
         redirect_uri,  # type: str
-        scopes = None, # type: Optional[List[str]]
+        scopes=None,  # type: Optional[List[str]]
     ):
         # type: (...) -> entities.AuthorizeAccountPayload
         """Obtain OAuth access token and refresh token.
@@ -134,7 +134,7 @@ class Client(object):
         provider,  # type: enums.ProviderType
         username,  # type: str
         account_key,  # type: str
-        scopes = None, # type: Optional[List[str]]
+        scopes=None,  # type: Optional[List[str]]
     ):
         # type: (...) -> entities.Account
         """Obtain a valid access token.
