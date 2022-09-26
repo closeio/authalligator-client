@@ -150,6 +150,19 @@ class AccountError(BaseAAEntity):
 
 
 @attr.attrs(frozen=True)
+class AccessToken(BaseAAEntity):
+    TYPENAME = "AccessToken"
+
+    token = attr.attrib()  # type: str
+    scopes = attr.attrib(
+        converter=converters.optional(list)
+    )  # type: Optional[List[str]]
+    expires_at = attr.attrib(
+        converter=converters.optional(ciso8601.parse_datetime)
+    )  # type: Optional[datetime.datetime]
+
+
+@attr.attrs(frozen=True)
 class Account(BaseAAEntity):
     TYPENAME = "Account"
 
@@ -159,6 +172,9 @@ class Account(BaseAAEntity):
     access_token_expires_at = attr.attrib(
         converter=converters.optional(ciso8601.parse_datetime),
     )  # type: Optional[datetime.datetime]
+    access = attr.attrib(
+        converter=entity_converter(AccessToken)  # type: ignore[misc]
+    )  # type: Union[Omitted, List[AccessToken]]
 
 
 @attr.attrs(frozen=True)

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from typing import Any, Dict, Type, TypeVar
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
 import attr
 import requests
@@ -68,6 +68,7 @@ class Client(object):
         provider,  # type: enums.ProviderType
         authorization_code,  # type: str
         redirect_uri,  # type: str
+        scopes=None,  # type: Optional[List[str]]
     ):
         # type: (...) -> entities.AuthorizeAccountPayload
         """Obtain OAuth access token and refresh token.
@@ -133,6 +134,7 @@ class Client(object):
         provider,  # type: enums.ProviderType
         username,  # type: str
         account_key,  # type: str
+        scopes=None,  # type: Optional[List[str]]
     ):
         # type: (...) -> entities.Account
         """Obtain a valid access token.
@@ -144,12 +146,13 @@ class Client(object):
                 will likely _not_ be the human-legible email/username)
             account_key: the AuthAlligator-specific secret key that proves we
                 have access to the specific account
+            scopes: a list of scopes to request for the access token
 
         Returns:
             The access token and expiration time for said access token.
         """
         query = """
-            query getAccount($access: AccountAccessInput!) {
+            query getAccount($access: AccountAccessInput!, $scopes: [String!]) {
               account(access: $access) {
                 __typename
                 ... on Account {
@@ -157,6 +160,11 @@ class Client(object):
                   username
                   accessToken
                   accessTokenExpiresAt
+                  access(scopes: $scopes) {
+                    token
+                    scopes
+                    expiresAt
+                  }
                 }
                 ... on AccountError {
                   code
@@ -173,7 +181,7 @@ class Client(object):
         )
         result = self._make_request(
             query=query,
-            variables={"access": input_var.as_dict()},
+            variables={"access": input_var.as_dict(), "scopes": scopes},
             return_types=entities.Query,
         )
         assert result.account is not entities.OMITTED

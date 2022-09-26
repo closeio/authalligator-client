@@ -50,7 +50,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo pip install .[tests] black isort mypy
+          command: sudo pip install .[tests] black isort mypy types-requests types-mock
       - run:
           name: black
           command: black --check .
