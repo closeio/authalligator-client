@@ -96,6 +96,11 @@ class Client(object):
                     username
                     accessToken
                     accessTokenExpiresAt
+                    access {
+                      token
+                      scopes
+                      expiresAt
+                    }
                   }
                   accountKey
                   numberOfAccountKeys
