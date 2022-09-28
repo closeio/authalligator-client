@@ -97,6 +97,8 @@ class TestAuthorizeAccount:
         assert account.username == "test-username"
         assert account.access_token == "access-token-example"
         assert account.access_token_expires_at == expires_at
+        assert account.access.token == "access-token-example"
+        assert account.access.expires_at == expires_at
 
     def test_authorize_account_errors(self, client):
         gql_response = {
@@ -156,6 +158,7 @@ class TestQueryAccount:
         assert account.access_token == "access-token-example"
         assert account.access_token_expires_at == expires_at
         assert account.access.token == "access-token-example"
+        assert account.access.expires_at == expires_at
 
     def test_query_account_errors(self, client):
         gql_response = {

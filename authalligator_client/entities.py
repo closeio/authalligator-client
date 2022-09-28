@@ -174,7 +174,7 @@ class Account(BaseAAEntity):
     )  # type: Optional[datetime.datetime]
     access = attr.attrib(
         converter=entity_converter(AccessToken)  # type: ignore[misc]
-    )  # type: Union[Omitted, List[AccessToken]]
+    )  # type: Union[Omitted, AccessToken]
 
 
 @attr.attrs(frozen=True)
