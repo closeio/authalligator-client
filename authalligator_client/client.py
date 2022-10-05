@@ -96,11 +96,6 @@ class Client(object):
                     username
                     accessToken
                     accessTokenExpiresAt
-                    access {
-                      token
-                      scopes
-                      expiresAt
-                    }
                   }
                   accountKey
                   numberOfAccountKeys
@@ -158,18 +153,13 @@ class Client(object):
         """
         query = """
             query getAccount($access: AccountAccessInput!, $scopes: [String!]) {
-              account(access: $access) {
+              account(access: $access, scopes: $scopes) {
                 __typename
                 ... on Account {
                   provider
                   username
                   accessToken
                   accessTokenExpiresAt
-                  access(scopes: $scopes) {
-                    token
-                    scopes
-                    expiresAt
-                  }
                 }
                 ... on AccountError {
                   code

@@ -68,11 +68,6 @@ class TestAuthorizeAccount:
                         "username": "test-username",
                         "accessToken": "access-token-example",
                         "accessTokenExpiresAt": expires_at.isoformat(),
-                        "access": {
-                            "token": "access-token-example",
-                            "scopes": ["scope1", "scope2"],
-                            "expiresAt": expires_at.isoformat(),
-                        },
                     },
                     "accountKey": "dummy-account-key",
                     "numberOfAccountKeys": 1,
@@ -97,8 +92,6 @@ class TestAuthorizeAccount:
         assert account.username == "test-username"
         assert account.access_token == "access-token-example"
         assert account.access_token_expires_at == expires_at
-        assert account.access.token == "access-token-example"
-        assert account.access.expires_at == expires_at
 
     def test_authorize_account_errors(self, client):
         gql_response = {
@@ -136,11 +129,6 @@ class TestQueryAccount:
                     "username": "test-username",
                     "accessToken": "access-token-example",
                     "accessTokenExpiresAt": expires_at.isoformat(),
-                    "access": {
-                        "token": "access-token-example",
-                        "scopes": ["scope1", "scope2"],
-                        "expiresAt": expires_at.isoformat(),
-                    },
                 }
             }
         }
@@ -157,8 +145,6 @@ class TestQueryAccount:
         assert account.username == "test-username"
         assert account.access_token == "access-token-example"
         assert account.access_token_expires_at == expires_at
-        assert account.access.token == "access-token-example"
-        assert account.access.expires_at == expires_at
 
     def test_query_account_errors(self, client):
         gql_response = {
@@ -240,11 +226,6 @@ class TestVerifyAccount:
                         "username": "test-username",
                         "accessToken": "test-access-token",
                         "accessTokenExpiresAt": expires_at.isoformat(),
-                        "access": {
-                            "token": "access-token-example",
-                            "scopes": ["scope1", "scope2"],
-                            "expiresAt": expires_at.isoformat(),
-                        },
                     },
                 }
             }
@@ -261,8 +242,6 @@ class TestVerifyAccount:
         assert isinstance(account, Account)
         assert account.provider == ProviderType.TEST
         assert account.username == "test-username"
-        assert account.access_token == "test-access-token"
-        assert account.access_token_expires_at == expires_at
 
     def test_verify_account_errors(self, client):
         gql_response = {
