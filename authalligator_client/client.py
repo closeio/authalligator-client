@@ -153,7 +153,7 @@ class Client(object):
         """
         query = """
             query getAccount($access: AccountAccessInput!, $scopes: [String!]) {
-              account(access: $access) {
+              account(access: $access, scopes: $scopes) {
                 __typename
                 ... on Account {
                   provider
