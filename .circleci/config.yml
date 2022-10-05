@@ -9,6 +9,7 @@ workflows:
       - test-3.7
       - test-3.8
       - static-code-analysis
+      - static-code-analysis-py2
 
 defaults: &defaults
   working_directory: ~/code
@@ -60,6 +61,19 @@ jobs:
       - run:
           name: mypy
           command: mypy authalligator_client tests
+      - run:
+          name: flake8
+          command: flake8
+
+  static-code-analysis-py2:
+    working_directory: ~/code
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: sudo pip install .[tests]
       - run:
           name: flake8
           command: flake8
