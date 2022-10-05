@@ -96,11 +96,6 @@ class Client(object):
                     username
                     accessToken
                     accessTokenExpiresAt
-                    access {
-                      token
-                      scopes
-                      expiresAt
-                    }
                   }
                   accountKey
                   numberOfAccountKeys
@@ -165,11 +160,6 @@ class Client(object):
                   username
                   accessToken
                   accessTokenExpiresAt
-                  access(scopes: $scopes) {
-                    token
-                    scopes
-                    expiresAt
-                  }
                 }
                 ... on AccountError {
                   code
