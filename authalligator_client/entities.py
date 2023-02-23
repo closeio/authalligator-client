@@ -194,7 +194,7 @@ class AuthorizeAccountPayload(BaseAAEntity):
     TYPENAME = "AuthorizeAccountPayload"
 
     account: Account = attr.attrib(
-        converter=entity_converter(Account)  # type: ignore[misc],
+        converter=entity_converter(Account)  # type: ignore[misc]
     )
     account_key: str = attr.attrib()
     number_of_account_keys: int = attr.attrib()
@@ -205,7 +205,7 @@ class VerifyAccountPayload(BaseAAEntity):
     TYPENAME = "VerifyAccountPayload"
 
     account: Account = attr.attrib(
-        converter=entity_converter(Account),  # type: ignore[misc]
+        converter=entity_converter(Account)  # type: ignore[misc]
     )
 
 
@@ -213,7 +213,7 @@ class VerifyAccountPayload(BaseAAEntity):
 class Query(BaseAAEntity):
     account: Union[Omitted, Account, AccountError] = attr.attrib(
         default=OMITTED,
-        converter=entity_converter([Account, AccountError]),  # type: ignore[misc]
+        converter=entity_converter([Account, AccountError])  # type: ignore[misc]
     )
 
 
