@@ -145,6 +145,7 @@ class AccountError(BaseAAEntity):
     message: Optional[str] = attr.attrib()
     retry_in: Optional[int] = attr.attrib()
 
+
 @attr.attrs(frozen=True)
 class Account(BaseAAEntity):
     TYPENAME = "Account"
@@ -212,7 +213,7 @@ class VerifyAccountPayload(BaseAAEntity):
 class Query(BaseAAEntity):
     account: Union[Omitted, Account, AccountError] = attr.attrib(
         default=OMITTED,
-        converter=entity_converter([Account, AccountError])  # type: ignore[misc]
+        converter=entity_converter([Account, AccountError]),  # type: ignore[misc]
     )
 
 

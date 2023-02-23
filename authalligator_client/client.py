@@ -39,9 +39,9 @@ class Client(object):
         # responses (even for errors) should always be HTTP 200
         if response.status_code != 200:
             if response.status_code in (401, 403):
-                exc_cls: Type[exc.UnexpectedStatusCode] = (
-                    exc.AuthAlligatorUnauthorizedError
-                )
+                exc_cls: Type[
+                    exc.UnexpectedStatusCode
+                ] = exc.AuthAlligatorUnauthorizedError
             else:
                 exc_cls = exc.UnexpectedStatusCode
 
@@ -67,7 +67,7 @@ class Client(object):
         provider: enums.ProviderType,
         authorization_code: str,
         redirect_uri: str,
-        scopes: Optional[List[str]]=None,
+        scopes: Optional[List[str]] = None,
     ) -> entities.AuthorizeAccountPayload:
         """Obtain OAuth access token and refresh token.
 
@@ -132,7 +132,7 @@ class Client(object):
         provider: enums.ProviderType,
         username: str,
         account_key: str,
-        scopes: Optional[List[str]]=None,
+        scopes: Optional[List[str]] = None,
     ) -> entities.Account:
         """Obtain a valid access token.
 

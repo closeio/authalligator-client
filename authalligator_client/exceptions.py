@@ -39,7 +39,13 @@ class ExecutionResultError(AuthAlligatorException):
 class AccountError(ExecutionResultError):
     """Corresponds with the AccountError entity type."""
 
-    def __init__(self, code: enums.AccountErrorCode, message: Optional[Union[str, bytes]], retry_in: Optional[int], *args):
+    def __init__(
+        self,
+        code: enums.AccountErrorCode,
+        message: Optional[Union[str, bytes]],
+        retry_in: Optional[int],
+        *args,
+    ):
         self.code = code
         self.message = message
         self.retry_in = retry_in
