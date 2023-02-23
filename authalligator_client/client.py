@@ -17,19 +17,18 @@ T = TypeVar("T", bound=entities.BaseAAEntity)
 
 @attr.attrs
 class Client(object):
-    token = attr.attrib()  # type: str
-    service_url = attr.attrib()  # type: str
+    token: str = attr.attrib()
+    service_url: str = attr.attrib()
 
-    timeout = attr.attrib(default=10)  # type: int
+    timeout: int = attr.attrib(default=10)
 
     @retry(exc=requests.exceptions.RequestException, tries=3, wait=1)
     def _make_request(
         self,
-        query,  # type: str
-        variables,  # type: Dict[str, Any]
-        return_types,  # type: Type[T]
-    ):
-        # type: (...) -> T
+        query: str,
+        variables: Dict[str, Any],
+        return_types: Type[T],
+    ) -> T:
         response = requests.post(
             "{}/graphql".format(self.service_url),
             json={"query": query, "variables": variables},
@@ -40,9 +39,9 @@ class Client(object):
         # responses (even for errors) should always be HTTP 200
         if response.status_code != 200:
             if response.status_code in (401, 403):
-                exc_cls = (
+                exc_cls: Type[exc.UnexpectedStatusCode] = (
                     exc.AuthAlligatorUnauthorizedError
-                )  # type: Type[exc.UnexpectedStatusCode]
+                )
             else:
                 exc_cls = exc.UnexpectedStatusCode
 
@@ -65,12 +64,11 @@ class Client(object):
 
     def authorize_account(
         self,
-        provider,  # type: enums.ProviderType
-        authorization_code,  # type: str
-        redirect_uri,  # type: str
-        scopes=None,  # type: Optional[List[str]]
-    ):
-        # type: (...) -> entities.AuthorizeAccountPayload
+        provider: enums.ProviderType,
+        authorization_code: str,
+        redirect_uri: str,
+        scopes: Optional[List[str]]=None,
+    ) -> entities.AuthorizeAccountPayload:
         """Obtain OAuth access token and refresh token.
 
         This does some basic error handling on the reponse.
@@ -131,12 +129,11 @@ class Client(object):
 
     def query_account(
         self,
-        provider,  # type: enums.ProviderType
-        username,  # type: str
-        account_key,  # type: str
-        scopes=None,  # type: Optional[List[str]]
-    ):
-        # type: (...) -> entities.Account
+        provider: enums.ProviderType,
+        username: str,
+        account_key: str,
+        scopes: Optional[List[str]]=None,
+    ) -> entities.Account:
         """Obtain a valid access token.
 
         Args:
@@ -190,11 +187,10 @@ class Client(object):
 
     def delete_other_account_keys(
         self,
-        provider,  # type: enums.ProviderType
-        username,  # type: str
-        account_key,  # type: str
-    ):
-        # type: (...) -> entities.DeleteOtherAccountKeysPayload
+        provider: enums.ProviderType,
+        username: str,
+        account_key: str,
+    ) -> entities.DeleteOtherAccountKeysPayload:
         """Delete other account keys which have access to this account.
 
         Args:
@@ -246,11 +242,10 @@ class Client(object):
 
     def verify_account(
         self,
-        provider,  # type: enums.ProviderType
-        username,  # type: str
-        account_key,  # type: str
-    ):
-        # type: (...) -> entities.VerifyAccountPayload
+        provider: enums.ProviderType,
+        username: str,
+        account_key: str,
+    ) -> entities.VerifyAccountPayload:
         """Verify that the current access token works, and refresh if needed.
 
         Args:
@@ -310,11 +305,10 @@ class Client(object):
 
     def delete_account_key(
         self,
-        provider,  # type: enums.ProviderType
-        username,  # type: str
-        account_key,  # type: str
-    ):
-        # type: (...) -> entities.DeleteAccountKeyPayload
+        provider: enums.ProviderType,
+        username: str,
+        account_key: str,
+    ) -> entities.DeleteAccountKeyPayload:
         """Delete this account key (but not others, if they exist).
 
         Args:
@@ -366,10 +360,9 @@ class Client(object):
 
     def delete_account(
         self,
-        provider,  # type: enums.ProviderType
-        username,  # type: str
-    ):
-        # type: (...) -> entities.DeleteAccountPayload
+        provider: enums.ProviderType,
+        username: str,
+    ) -> entities.DeleteAccountPayload:
         """Delete this account (and all associated account keys).
 
         Args:

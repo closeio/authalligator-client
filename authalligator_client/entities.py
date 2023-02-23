@@ -31,9 +31,8 @@ U = TypeVar("U", bound="BaseAAEntity")
 
 
 def entity_converter(
-    entity_cls,  # type: Union[List[Type[U]], Type[U]]
-):
-    # type: (...) -> Callable[[Union[Omitted, U, Dict]], Union[U, Omitted]]
+    entity_cls: Union[List[Type[U]], Type[U]],
+) -> Callable[[Union[Omitted, U, Dict]], Union[U, Omitted]]:
     """
     Convert a dictionary response into instances of the entity class.
 
@@ -58,14 +57,13 @@ def entity_converter(
         provided entity. If none of the provided types match of if the fields
         don't align with the provided entity, a ``TypeError`` is raised.
     """
-    entity_classes = []  # type: List[Type[U]]
+    entity_classes: List[Type[U]] = []
     if isinstance(entity_cls, (list, tuple)):
         entity_classes = entity_cls
     else:
         entity_classes = [entity_cls]
 
-    def _entity_converter(val):
-        # type: (Union[Dict[str, Any], U, Omitted]) -> Union[U, Omitted]
+    def _entity_converter(val: Union[Dict[str, Any], U, Omitted]) -> Union[U, Omitted]:
         # check if it's explitly been omitted (don't try to convert those)
         if val is OMITTED:
             return val
@@ -82,7 +80,7 @@ def entity_converter(
         # right one based on ``__typename``
         if len(entity_classes) == 1:
             # only one option, we don't need an explicit type
-            selected_cls = entity_classes[0]  # type: Type[U]
+            selected_cls: Type[U] = entity_classes[0]
         else:
             # a few different return types are expected
             typename = val.pop("__typename", None)
@@ -93,9 +91,9 @@ def entity_converter(
                     "types: [{}]".format(type_options)
                 )
 
-            matching_typename = next(
+            matching_typename: Optional[Type[U]] = next(
                 (e for e in entity_classes if e.TYPENAME == typename), None
-            )  # type: Optional[Type[U]]
+            )
             if matching_typename is None:
                 raise TypeError('No entity found for type "{}"'.format(typename))
 
@@ -108,7 +106,7 @@ def entity_converter(
 
 @attr.attrs(frozen=True)
 class BaseAAEntity(object):
-    TYPENAME = ""  # type: str
+    TYPENAME: str = ""
     """The name of the graphql type in the schema.
 
     Used for disambiguation when there's more than one possible type being
@@ -118,8 +116,7 @@ class BaseAAEntity(object):
     as_dict = as_json_dict
 
     @classmethod
-    def from_api_response(cls, data):
-        # type: (Type[U], Dict[str, Any]) -> U
+    def from_api_response(cls: Type[U], data: Dict[str, Any]) -> U:
         # If __typename is present, this asserts that it matches this class's
         # expected typename
         typename = data.pop("__typename", None)
@@ -144,21 +141,20 @@ class BaseAAEntity(object):
 class AccountError(BaseAAEntity):
     TYPENAME = "AccountError"
 
-    code = attr.attrib(converter=enums.AccountErrorCode)  # type: enums.AccountErrorCode
-    message = attr.attrib()  # type: Optional[str]
-    retry_in = attr.attrib()  # type: Optional[int]
-
+    code: enums.AccountErrorCode = attr.attrib(converter=enums.AccountErrorCode)
+    message: Optional[str] = attr.attrib()
+    retry_in: Optional[int] = attr.attrib()
 
 @attr.attrs(frozen=True)
 class Account(BaseAAEntity):
     TYPENAME = "Account"
 
-    provider = attr.attrib(converter=enums.ProviderType)  # type: enums.ProviderType
-    username = attr.attrib()  # type: str
-    access_token = attr.attrib()  # type: Optional[str]
-    access_token_expires_at = attr.attrib(
+    provider: enums.ProviderType = attr.attrib(converter=enums.ProviderType)
+    username: str = attr.attrib()
+    access_token: Optional[str] = attr.attrib()
+    access_token_expires_at: Optional[datetime.datetime] = attr.attrib(
         converter=converters.optional(ciso8601.parse_datetime),
-    )  # type: Optional[datetime.datetime]
+    )
 
 
 @attr.attrs(frozen=True)
@@ -196,68 +192,68 @@ class DeleteAccountPayload(DeleteOperation):
 class AuthorizeAccountPayload(BaseAAEntity):
     TYPENAME = "AuthorizeAccountPayload"
 
-    account = attr.attrib(
-        converter=entity_converter(Account),  # type: ignore[misc]
-    )  # type: Account
-    account_key = attr.attrib()  # type: str
-    number_of_account_keys = attr.attrib()  # type: int
+    account: Account = attr.attrib(
+        converter=entity_converter(Account)  # type: ignore[misc],
+    )
+    account_key: str = attr.attrib()
+    number_of_account_keys: int = attr.attrib()
 
 
 @attr.attrs(frozen=True)
 class VerifyAccountPayload(BaseAAEntity):
     TYPENAME = "VerifyAccountPayload"
 
-    account = attr.attrib(
+    account: Account = attr.attrib(
         converter=entity_converter(Account),  # type: ignore[misc]
-    )  # type: Account
+    )
 
 
 @attr.attrs(frozen=True)
 class Query(BaseAAEntity):
-    account = attr.attrib(
+    account: Union[Omitted, Account, AccountError] = attr.attrib(
         default=OMITTED,
-        converter=entity_converter([Account, AccountError]),  # type: ignore[misc]
-    )  # type: Union[Omitted, Account, AccountError]
+        converter=entity_converter([Account, AccountError])  # type: ignore[misc]
+    )
 
 
 @attr.attrs(frozen=True)
 class Mutation(BaseAAEntity):
     # mypy and the attrs plugin doens't like the `Omitted` default + converter
     # stuff
-    authorize_account = attr.attrib(  # type: ignore
+    authorize_account: Union[Omitted, AuthorizeAccountPayload, AccountError] = attr.attrib(  # type: ignore
         default=OMITTED,
         # ignore unsupport converter warning
         converter=cast(  # type: ignore[misc]
             Union[Omitted, AuthorizeAccountPayload, AccountError],
             entity_converter([AuthorizeAccountPayload, AccountError]),
         ),
-    )  # type: Union[Omitted, AuthorizeAccountPayload, AccountError]
-    verify_account = attr.attrib(  # type: ignore
+    )
+    verify_account: Union[Omitted, VerifyAccountPayload, AccountError] = attr.attrib(  # type: ignore
         default=OMITTED,
         converter=cast(  # type: ignore[misc]
             Union[Omitted, VerifyAccountPayload, AccountError],
             entity_converter([VerifyAccountPayload, AccountError]),
         ),
-    )  # type: Union[Omitted, VerifyAccountPayload, AccountError]
-    delete_account = attr.attrib(  # type: ignore
+    )
+    delete_account: Union[Omitted, DeleteAccountPayload, AccountError] = attr.attrib(  # type: ignore
         default=OMITTED,
         converter=cast(  # type: ignore[misc]
             Union[Omitted, DeleteAccountPayload, AccountError],
             entity_converter([DeleteAccountPayload, AccountError]),
         ),
-    )  # type: Union[Omitted, DeleteAccountPayload, AccountError]
-    delete_account_key = attr.attrib(  # type: ignore
+    )
+    delete_account_key: Union[Omitted, DeleteAccountKeyPayload, AccountError] = attr.attrib(  # type: ignore
         default=OMITTED,
         converter=cast(  # type: ignore[misc]
             Union[Omitted, DeleteAccountKeyPayload, AccountError],
             entity_converter([DeleteAccountKeyPayload, AccountError]),
         ),
-    )  # type: Union[Omitted, DeleteAccountKeyPayload, AccountError]
-    delete_other_account_keys = attr.attrib(  # type: ignore
+    )
+    delete_other_account_keys: Union[Omitted, DeleteOtherAccountKeysPayload, AccountError] = attr.attrib(  # type: ignore
         default=OMITTED,
         # ignore unsupport converter warning
         converter=cast(  # type: ignore[misc]
             Union[Omitted, DeleteOtherAccountKeysPayload, AccountError],
             entity_converter([DeleteOtherAccountKeysPayload, AccountError]),
         ),
-    )  # type: Union[Omitted, DeleteOtherAccountKeysPayload, AccountError]
+    )
