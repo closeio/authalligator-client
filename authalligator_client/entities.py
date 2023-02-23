@@ -213,7 +213,7 @@ class VerifyAccountPayload(BaseAAEntity):
 class Query(BaseAAEntity):
     account: Union[Omitted, Account, AccountError] = attr.attrib(
         default=OMITTED,
-        converter=entity_converter([Account, AccountError])  # type: ignore[misc]
+        converter=entity_converter([Account, AccountError]),  # type: ignore[misc]
     )
 
 
