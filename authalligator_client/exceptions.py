@@ -10,8 +10,7 @@ class AuthAlligatorException(Exception):
 class UnexpectedStatusCode(AuthAlligatorException):
     """Raised when AuthAlligator returns a non-200 response."""
 
-    def __init__(self, status_code, content, *args):
-        # type: (int, Union[str, bytes], *Any) -> None
+    def __init__(self, status_code: int, content: Union[str, bytes], *args):
         self.status_code = status_code
         self.content = content
         super(UnexpectedStatusCode, self).__init__(*args)
@@ -20,8 +19,7 @@ class UnexpectedStatusCode(AuthAlligatorException):
 class AuthAlligatorQueryError(AuthAlligatorException):
     """Raised when an operation results in errors."""
 
-    def __init__(self, errors, *args):
-        # type: (List[Dict[str, Any]], *Any) -> None
+    def __init__(self, errors: List[Dict[str, Any]], *args):
         self.errors = errors
         super(AuthAlligatorQueryError, self).__init__(*args)
 
@@ -41,8 +39,13 @@ class ExecutionResultError(AuthAlligatorException):
 class AccountError(ExecutionResultError):
     """Corresponds with the AccountError entity type."""
 
-    def __init__(self, code, message, retry_in, *args):
-        # type: (enums.AccountErrorCode, Optional[Union[str, bytes]], Optional[int], *Any) -> None
+    def __init__(
+        self,
+        code: enums.AccountErrorCode,
+        message: Optional[str],
+        retry_in: Optional[int],
+        *args,
+    ):
         self.code = code
         self.message = message
         self.retry_in = retry_in

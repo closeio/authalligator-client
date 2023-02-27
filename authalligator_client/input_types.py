@@ -14,19 +14,19 @@ class AuthAlligatorInputType(object):
 
 @attr.attrs()
 class AuthorizeAccountInput(AuthAlligatorInputType):
-    provider = attr.attrib(converter=enums.ProviderType)  # type: enums.ProviderType
-    authorization_code = attr.attrib()  # type: str
-    redirect_uri = attr.attrib()  # type: str
+    provider: enums.ProviderType = attr.attrib(converter=enums.ProviderType)
+    authorization_code: str = attr.attrib()
+    redirect_uri: str = attr.attrib()
 
 
 @attr.attrs()
 class AccountAccessInput(AuthAlligatorInputType):
-    provider = attr.attrib(converter=enums.ProviderType)  # type: enums.ProviderType
-    username = attr.attrib()  # type: str
-    account_key = attr.attrib()  # type: str
+    provider: enums.ProviderType = attr.attrib(converter=enums.ProviderType)
+    username: str = attr.attrib()
+    account_key: str = attr.attrib()
 
 
 @attr.attrs()
 class DeleteAccountInput(AuthAlligatorInputType):
-    provider = attr.attrib(converter=enums.ProviderType)  # type: enums.ProviderType
-    username = attr.attrib()  # type: str
+    provider: enums.ProviderType = attr.attrib(converter=enums.ProviderType)
+    username: str = attr.attrib()

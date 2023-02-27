@@ -1,6 +1,4 @@
-# workaround for open() with encoding='' python2/3 compability
 import sys
-from io import open
 
 from setuptools import setup
 
@@ -38,11 +36,10 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     packages=["authalligator_client"],
     extras_require={"tests": tests_require},

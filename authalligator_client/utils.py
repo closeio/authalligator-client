@@ -7,8 +7,7 @@ from typing import Any, Dict
 import attr
 
 
-def to_camel_case(snake_str):
-    # type: (str) -> str
+def to_camel_case(snake_str: str) -> str:
     """Convert snake_case to camelCase.
 
     Adapted from this response in Stackoverflow:
@@ -25,8 +24,7 @@ _to_snake_case_regex_1 = re.compile("(.)([A-Z][a-z]+)")
 _to_snake_case_regex_2 = re.compile("([a-z0-9])([A-Z])")
 
 
-def to_snake_case(name):
-    # type: (str) -> str
+def to_snake_case(name: str) -> str:
     """Convert camelCase to snake_case.
 
     From this response in Stackoverflow:
@@ -36,8 +34,7 @@ def to_snake_case(name):
     return _to_snake_case_regex_2.sub(r"\1_\2", s1).lower()
 
 
-def as_json_dict(obj):
-    # type: (Any) -> Dict
+def as_json_dict(obj: Any) -> Dict:
     """
     Similar to attr.asdict, but will prioritize an `as_dict` instance method
     over ``attr.asdict`` (if present) on nested objects and tries to convert
