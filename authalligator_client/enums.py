@@ -15,3 +15,4 @@ class ProviderType(Enum):
     GOOGLE = "GOOGLE"
     ZOOM = "ZOOM"
     MICROSOFT = "MICROSOFT"
+    CALENDLY = "CALENDLY"
