@@ -42,7 +42,7 @@ class AccountError(ExecutionResultError):
     def __init__(
         self,
         code: enums.AccountErrorCode,
-        message: Optional[Union[str, bytes]],
+        message: Optional[str],
         retry_in: Optional[int],
         *args,
     ):
