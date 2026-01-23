@@ -39,9 +39,9 @@ class Client(object):
         # responses (even for errors) should always be HTTP 200
         if response.status_code != 200:
             if response.status_code in (401, 403):
-                exc_cls: Type[
-                    exc.UnexpectedStatusCode
-                ] = exc.AuthAlligatorUnauthorizedError
+                exc_cls: Type[exc.UnexpectedStatusCode] = (
+                    exc.AuthAlligatorUnauthorizedError
+                )
             else:
                 exc_cls = exc.UnexpectedStatusCode
 
